@@ -145,7 +145,8 @@ namespace Green
             } 
 
             // Move boxes
-            boxManager.Update(gameTime);
+            boxManager.Update(gameTime, ref score);
+
 
             // Update goos
             for (int i = 0; i < gooList.Count; i++)

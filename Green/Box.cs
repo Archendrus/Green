@@ -13,6 +13,7 @@ namespace Green
     {
         private float speed;
         public bool IsBigBox { get; private set; }
+        public bool Filled { get; set; }
 
         public Rectangle HitBox
         {
@@ -30,7 +31,8 @@ namespace Green
             : base(texture,position,scale)
         {
             speed = 80f;
-            this.IsBigBox = isBigBox;
+            IsBigBox = isBigBox;
+            Filled = false;
         }
 
         public void Update(GameTime time)

@@ -53,7 +53,7 @@ namespace Green
 
         }
 
-        public void Update(GameTime time)
+        public void Update(GameTime time, ref int score)
         {
             MakeBoxes(time);
             for (int i = 0; i < Boxes.Count; i++)
@@ -61,6 +61,10 @@ namespace Green
                 Boxes[i].Update(time);
                 if (Boxes[i].Position.X > screen.Right)
                 {
+                    if (Boxes[i].Filled)
+                    {
+                        score++;
+                    }
                     Boxes[i].Kill();
                     Boxes.Remove(Boxes[i]);
                 }
@@ -110,15 +114,14 @@ namespace Green
 
         }
 
-        public bool FillBox(Box box, int chargeCount)
+        public void FillBox(Box box, int chargeCount)
         {
-            bool filled = false;
             if (box.IsBigBox)
             {
                 if (chargeCount == 4)
                 {
                     box.ChangeTexture(bigBoxFull);
-                    filled = true;
+                    box.Filled = true;
                 }
                 else if (chargeCount < 4)
                 {
@@ -134,7 +137,7 @@ namespace Green
                 if (chargeCount == 2)
                 {
                     box.ChangeTexture(smallBoxFull);
-                    filled = true;
+                    box.Filled = true;
                 }
                 else if (chargeCount < 2)
                 {
@@ -145,8 +148,6 @@ namespace Green
                     box.ChangeTexture(smallBoxOver);
                 }
             }
-
-            return filled;
 
         }
     }
