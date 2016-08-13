@@ -13,7 +13,7 @@ namespace Green
 {
     class BoxManager
     {
-        public List<Box> boxes { get; private set; } // List of boxes
+        public List<Box> Boxes { get; private set; } // List of boxes
         Texture2D smallBoxTexture;
         Texture2D bigBoxTexture;
         Rectangle screen;
@@ -26,7 +26,7 @@ namespace Green
 
         public BoxManager(ContentManager content, Vector2 scale, Rectangle screen)
         {
-            boxes = new List<Box>();
+            Boxes = new List<Box>();
             this.screen = screen;
             this.scale = scale;
 
@@ -40,13 +40,13 @@ namespace Green
         public void Update(GameTime time)
         {
             MakeBoxes(time);
-            for (int i = 0; i < boxes.Count; i++)
+            for (int i = 0; i < Boxes.Count; i++)
             {
-                boxes[i].Update(time);
-                if (boxes[i].Position.X > screen.Right)
+                Boxes[i].Update(time);
+                if (Boxes[i].Position.X > screen.Right)
                 {
-                    boxes[i].Kill();
-                    boxes.Remove(boxes[i]);
+                    Boxes[i].Kill();
+                    Boxes.Remove(Boxes[i]);
                 }
 
             }
@@ -55,9 +55,9 @@ namespace Green
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            for (int i=0; i<boxes.Count;i++)
+            for (int i=0; i<Boxes.Count;i++)
             {
-                boxes[i].Draw(spriteBatch);
+                Boxes[i].Draw(spriteBatch);
             }
         }
 
@@ -86,7 +86,7 @@ namespace Green
                     newPosition = new Vector2(0, 128);
                 }
 
-                boxes.Add(new Box(newTexture, newPosition, isBigBox, scale));
+                Boxes.Add(new Box(newTexture, newPosition, isBigBox, scale));
                 boxTimerElapsed = 0;
             }
 

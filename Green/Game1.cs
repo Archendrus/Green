@@ -25,6 +25,9 @@ namespace Green
         List<Goo> gooList;
         Texture2D gooTexture;
 
+        List<Sprite> chargeList;
+        Texture2D chargeTexture;
+
         BoxManager boxManager;
 
         public Game1()
@@ -76,6 +79,9 @@ namespace Green
             gooTexture = Content.Load<Texture2D>("goo");
             gooList = new List<Goo>();
 
+            chargeTexture = Content.Load<Texture2D>("charge");
+            chargeList = new List<Sprite>();
+
         }
 
         /// <summary>
@@ -95,30 +101,66 @@ namespace Green
         protected override void Update(GameTime gameTime)
         {
             KeyboardState newState = Keyboard.GetState();
-
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            // Exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            // fire goo
             if (newState.IsKeyDown(Keys.Down) && oldState.IsKeyUp(Keys.Down))
             {
-                 gooList.Add(new Goo(gooTexture, new Vector2(192, 48), Scale));
+                 if (chargeList.Count > 0)
+                {
+                    chargeList.Clear();
+                    gooList.Add(new Goo(gooTexture, new Vector2(192, 48), Scale));
+                }
             }
 
-            // TODO: Add your update logic here
+            // charge machine
+            if (newState.IsKeyDown(Keys.Up) && oldState.IsKeyUp(Keys.Up))
+            {
+                if (chargeList.Count < 4)
+                {
+                    float xPos = 160 + chargeList.Count * 16; 
+                    chargeList.Add(new Sprite(chargeTexture, new Vector2(xPos, 0), Scale));
+                }
+            } 
+
+            // Move boxes
             boxManager.Update(gameTime);
 
+            // Update goos
             for (int i = 0; i < gooList.Count; i++)
             {
                 gooList[i].Update(gameTime);
-                if (gooList[i].Position.Y > 144 * Scale.Y)
+
+                // Check collision with boxes
+                for (int j = 0; j < boxManager.Boxes.Count; j++)
+                {
+                    if (gooList[i].BoundingRect.Intersects(boxManager.Boxes[j].BoundingRect))
+                    {
+                        gooList[i].Kill();
+                    }
+                }
+
+                // Check collision with belt
+                if (gooList[i].Position.Y > 144 * Scale.Y && gooList[i].IsAlive)
                 {
                     gooList[i].Kill();
+                }
+            }
+
+            // Cleanup dead goos
+            for (int i = 0; i < gooList.Count; i++)
+            {
+                if (!gooList[i].IsAlive)
+                {
                     gooList.Remove(gooList[i]);
                 }
             }
 
             oldState = newState;
-
             base.Update(gameTime);
         }
 
@@ -141,10 +183,20 @@ namespace Green
 
             // Draw map
             tileMap.Draw(spriteBatch);
+
+            // Draw boxes
             boxManager.Draw(spriteBatch);
+
+            // Draw goos
             for (int i = 0; i < gooList.Count; i++)
             {
                 gooList[i].Draw(spriteBatch);
+            }
+
+            // Draw charges
+            for (int i = 0; i < chargeList.Count; i++)
+            {
+                chargeList[i].Draw(spriteBatch);
             }
 
             spriteBatch.End();
