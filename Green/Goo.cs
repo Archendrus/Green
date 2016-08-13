@@ -12,11 +12,13 @@ namespace Green
     class Goo : Sprite
     {
         private float speed;
+        public int Charges { get; private set; }
 
-        public Goo(Texture2D texture, Vector2 position, Vector2 scale)
+        public Goo(Texture2D texture, Vector2 position, Vector2 scale, int charges)
             : base(texture, position, scale)
         {
-            speed = 150f;
+            speed = 250f;
+            this.Charges = charges;
         }
 
         public void Update(GameTime time)

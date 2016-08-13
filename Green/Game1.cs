@@ -22,6 +22,8 @@ namespace Green
 
         TileMap tileMap;
 
+        SpriteFont font;
+
         List<Goo> gooList;
         Texture2D gooTexture;
 
@@ -29,6 +31,11 @@ namespace Green
         Texture2D chargeTexture;
 
         BoxManager boxManager;
+
+        int score;
+
+        // DEBUG
+        Texture2D pixel;
 
         public Game1()
         {
@@ -55,6 +62,8 @@ namespace Green
 
             Scale = new Vector2(3, 3);
 
+            score = 0;
+
 
             base.Initialize();
         }
@@ -67,6 +76,8 @@ namespace Green
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            font = Content.Load<SpriteFont>("emulogic");
 
             // TODO: use this.Content to load your game content here
             Texture2D temp;
@@ -81,6 +92,12 @@ namespace Green
 
             chargeTexture = Content.Load<Texture2D>("charge");
             chargeList = new List<Sprite>();
+
+
+            // DEBUG
+            pixel = new Texture2D(GraphicsDevice,1,1,false,SurfaceFormat.Color);
+            pixel.SetData(new[] { Color.White });
+
 
         }
 
@@ -112,15 +129,15 @@ namespace Green
             {
                  if (chargeList.Count > 0)
                 {
+                    gooList.Add(new Goo(gooTexture, new Vector2(192, 48), Scale, chargeList.Count));
                     chargeList.Clear();
-                    gooList.Add(new Goo(gooTexture, new Vector2(192, 48), Scale));
                 }
             }
 
             // charge machine
             if (newState.IsKeyDown(Keys.Up) && oldState.IsKeyUp(Keys.Up))
             {
-                if (chargeList.Count < 4)
+                if (chargeList.Count < 5)
                 {
                     float xPos = 160 + chargeList.Count * 16; 
                     chargeList.Add(new Sprite(chargeTexture, new Vector2(xPos, 0), Scale));
@@ -138,8 +155,9 @@ namespace Green
                 // Check collision with boxes
                 for (int j = 0; j < boxManager.Boxes.Count; j++)
                 {
-                    if (gooList[i].BoundingRect.Intersects(boxManager.Boxes[j].BoundingRect))
+                    if (gooList[i].BoundingRect.Intersects(boxManager.Boxes[j].HitBox))
                     {
+                        boxManager.FillBox(boxManager.Boxes[j],gooList[i].Charges);
                         gooList[i].Kill();
                     }
                 }
@@ -185,7 +203,7 @@ namespace Green
             tileMap.Draw(spriteBatch);
 
             // Draw boxes
-            boxManager.Draw(spriteBatch);
+            boxManager.Draw(spriteBatch, pixel);
 
             // Draw goos
             for (int i = 0; i < gooList.Count; i++)
@@ -198,6 +216,8 @@ namespace Green
             {
                 chargeList[i].Draw(spriteBatch);
             }
+
+            spriteBatch.DrawString(font,score + "/20", new Vector2(350, 0) * Scale, Color.White);
 
             spriteBatch.End();
 

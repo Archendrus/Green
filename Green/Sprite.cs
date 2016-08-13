@@ -74,6 +74,11 @@ namespace Green
             IsAlive = true;
         }
 
+        public void ChangeTexture(Texture2D texture)
+        {
+            this.texture = texture;
+        }
+
         // Draw sprite at position at Game1.Scale
         public void Draw(SpriteBatch spriteBatch)
         {

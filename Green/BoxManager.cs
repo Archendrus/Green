@@ -14,8 +14,17 @@ namespace Green
     class BoxManager
     {
         public List<Box> Boxes { get; private set; } // List of boxes
+
         Texture2D smallBoxTexture;
+        Texture2D smallBoxFull;
+        Texture2D smallBoxHalf;
+        Texture2D smallBoxOver;
+
         Texture2D bigBoxTexture;
+        Texture2D bigBoxFull;
+        Texture2D bigBoxHalf;
+        Texture2D bigBoxOver;
+
         Rectangle screen;
 
         Random randomGen;
@@ -33,7 +42,14 @@ namespace Green
             randomGen = new Random();
 
             smallBoxTexture = content.Load<Texture2D>("smallBox");
+            smallBoxFull = content.Load<Texture2D>("smallBoxFull");
+            smallBoxHalf = content.Load<Texture2D>("smallBoxHalf");
+            smallBoxOver = content.Load<Texture2D>("smallBoxOver");
+
             bigBoxTexture = content.Load<Texture2D>("bigBox");
+            bigBoxFull = content.Load<Texture2D>("BigBoxFull");
+            bigBoxHalf = content.Load<Texture2D>("BigBoxHalf");
+            bigBoxOver = content.Load<Texture2D>("BigBoxOver");
 
         }
 
@@ -53,11 +69,13 @@ namespace Green
 
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, Texture2D pixel)
         {
-            for (int i=0; i<Boxes.Count;i++)
+            for (int i = 0; i < Boxes.Count; i++)
             {
                 Boxes[i].Draw(spriteBatch);
+                // DEBUG
+                //spriteBatch.Draw(pixel, Boxes[i].HitBox, Color.White);
             }
         }
 
@@ -66,7 +84,7 @@ namespace Green
             float boxRate = 3f;
             boxTimerElapsed += (float)time.ElapsedGameTime.TotalSeconds;
 
-            if(boxTimerElapsed > boxRate)
+            if (boxTimerElapsed > boxRate)
             {
                 bool isBigBox;
                 Texture2D newTexture;
@@ -92,5 +110,44 @@ namespace Green
 
         }
 
+        public bool FillBox(Box box, int chargeCount)
+        {
+            bool filled = false;
+            if (box.IsBigBox)
+            {
+                if (chargeCount == 4)
+                {
+                    box.ChangeTexture(bigBoxFull);
+                    filled = true;
+                }
+                else if (chargeCount < 4)
+                {
+                    box.ChangeTexture(bigBoxHalf);
+                }
+                else // chargeCount > 4
+                {
+                    box.ChangeTexture(bigBoxOver);
+                }
+            }
+            else
+            {
+                if (chargeCount == 2)
+                {
+                    box.ChangeTexture(smallBoxFull);
+                    filled = true;
+                }
+                else if (chargeCount < 2)
+                {
+                    box.ChangeTexture(smallBoxHalf);
+                }
+                else // chargeCount > 2
+                {
+                    box.ChangeTexture(smallBoxOver);
+                }
+            }
+
+            return filled;
+
+        }
     }
 }
