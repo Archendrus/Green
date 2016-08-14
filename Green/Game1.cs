@@ -36,6 +36,9 @@ namespace Green
         BoxManager boxManager;
         HumanManager humanManager;
 
+        Texture2D fgMachine;
+        Sprite fgMachineSp;
+
         Viewport newViewport;
         Camera2D camera;
 
@@ -222,7 +225,7 @@ namespace Green
                 // Check collision with boxes
                 for (int j = 0; j < boxManager.Boxes.Count; j++)
                 {
-                    if (gooList[i].BoundingRect.Intersects(boxManager.Boxes[j].HitBox))
+                    if (gooList[i].HitBox.Intersects(boxManager.Boxes[j].HitBox))
                     {
                         boxManager.FillBox(boxManager.Boxes[j], gooList[i].Charges);
                         gooList[i].Kill();
@@ -243,6 +246,12 @@ namespace Green
                 {
                     gooList.Remove(gooList[i]);
                 }
+            }
+
+            // Win condtion
+            if (score == 20 && currentState != GameState.Ending)
+            {
+                ChangeState(GameState.Ending);
             }
         }
 
@@ -289,18 +298,20 @@ namespace Green
             // Draw map
             tileMap.Draw(spriteBatch);
 
+            // Draw goos
+            for (int i = 0; i < gooList.Count; i++)
+            {
+                gooList[i].Draw(spriteBatch);
+                //spriteBatch.Draw(pixel, gooList[i].HitBox, Color.White);
+            }
+
             // Draw boxes
             boxManager.Draw(spriteBatch, pixel);
 
             if (currentState == GameState.Ending)
             {
                 humanManager.Draw(spriteBatch);
-            }
-
-            // Draw goos
-            for (int i = 0; i < gooList.Count; i++)
-            {
-                gooList[i].Draw(spriteBatch);
+                fgMachineSp.Draw(spriteBatch);
             }
 
             // Draw charges
@@ -309,7 +320,7 @@ namespace Green
                 chargeList[i].Draw(spriteBatch);
             }
 
-            spriteBatch.DrawString(font,score + "/20", new Vector2(325, 0 + 240), Color.White);
+            spriteBatch.DrawString(font,score + "/20", new Vector2(300, 0 + 240), Color.White);
 
             spriteBatch.End();
 
@@ -342,6 +353,8 @@ namespace Green
                     }
                 case GameState.Ending:
                     {
+                        fgMachine = Content.Load<Texture2D>("fgMachine");
+                        fgMachineSp = new Sprite(fgMachine, new Vector2(192,192), Scale);
                         humanManager = new HumanManager(Content);
                         break;
                     }

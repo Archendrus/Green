@@ -27,6 +27,11 @@ namespace Green
             for (int i = 0; i < Humans.Count; i++)
             {
                 Humans[i].Update(time);
+                if (Humans[i].Position.Y > 192)
+                {
+                    Humans[i].Kill();
+                    Humans.Remove(Humans[i]);
+                }
             }
         }
 
