@@ -45,6 +45,8 @@
     <Compile Include="Camera2D.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Goo.cs" />
+    <Compile Include="Human.cs" />
+    <Compile Include="HumanManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Box.cs" />
@@ -94,6 +96,7 @@
     <None Include="Content\goo.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Content\Human.xnb" />
     <None Include="Content\smallBox.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -34,11 +34,22 @@ namespace Green
         Texture2D chargeTexture;
 
         BoxManager boxManager;
+        HumanManager humanManager;
 
         Viewport newViewport;
         Camera2D camera;
 
+        float endingElapsed;
+
         int score;
+
+        enum GameState
+        {
+            Game,
+            Ending
+        }
+
+        GameState currentState;
 
         // DEBUG
         Texture2D pixel;
@@ -81,11 +92,11 @@ namespace Green
 
             camera = new Camera2D(GraphicsDevice.Viewport);
 
-            Console.WriteLine(GraphicsDevice.Viewport);
-
             Scale = new Vector2(1, 1);
 
             score = 0;
+
+            currentState = GameState.Game;
 
 
             base.Initialize();
@@ -150,12 +161,33 @@ namespace Green
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            switch (currentState)
+            {
+                case GameState.Game:
+                    {
+                        GameStateUpdate(gameTime, newState);
+                        break;
+                    }
+                case GameState.Ending:
+                    {
+                        GameStateUpdate(gameTime, newState);
+                        EndingStateUpdate(gameTime);
+                        break;
+                    }
+            }
+
+            oldState = newState;
+            base.Update(gameTime);
+        }
+
+        private void GameStateUpdate(GameTime gameTime, KeyboardState newState)
+        {
             // fire goo
             if (newState.IsKeyDown(Keys.Down) && oldState.IsKeyUp(Keys.Down))
             {
-                 if (chargeList.Count > 0)
+                if (chargeList.Count > 0)
                 {
-                    gooList.Add(new Goo(gooTexture, new Vector2(192, 48), Scale, chargeList.Count));
+                    gooList.Add(new Goo(gooTexture, new Vector2(192, 48 + 240), Scale, chargeList.Count));
                     chargeList.Clear();
                 }
             }
@@ -165,27 +197,16 @@ namespace Green
             {
                 if (chargeList.Count < 5)
                 {
-                    float xPos = 160 + chargeList.Count * 16; 
-                    chargeList.Add(new Sprite(chargeTexture, new Vector2(xPos, 0), Scale));
+                    float xPos = 160 + chargeList.Count * 16;
+                    chargeList.Add(new Sprite(chargeTexture, new Vector2(xPos, 0 + 240), Scale));
                 }
             }
 
-            if (newState.IsKeyDown(Keys.S) && oldState.IsKeyUp(Keys.S))
-            {
-                //camera.Position -= new Vector2(0, 250) * elapsed;
-                tileMap.ChangeMap();
-                //GraphicsDevice.Viewport = new Viewport(0, 360, 400 * 3, 240 * 3);
-
-                camera.Position = new Vector2(0, 720);
-            }
 
             if (newState.IsKeyDown(Keys.X))
             {
+                ChangeState(GameState.Ending);
                 //camera.Position -= new Vector2(0, 250) * elapsed;
-                //tileMap.ChangeMap();
-                //GraphicsDevice.Viewport = new Viewport(0, 360, 400 * 3, 240 * 3);
-
-                camera.Position -= new Vector2(0, 250) * elapsed;
             }
 
             //tileMap.Update(gameTime);
@@ -203,13 +224,13 @@ namespace Green
                 {
                     if (gooList[i].BoundingRect.Intersects(boxManager.Boxes[j].HitBox))
                     {
-                        boxManager.FillBox(boxManager.Boxes[j],gooList[i].Charges);
+                        boxManager.FillBox(boxManager.Boxes[j], gooList[i].Charges);
                         gooList[i].Kill();
                     }
                 }
 
                 // Check collision with belt
-                if (gooList[i].Position.Y > 144 * Scale.Y && gooList[i].IsAlive)
+                if (gooList[i].Position.Y > 144 + 240 && gooList[i].IsAlive)
                 {
                     gooList[i].Kill();
                 }
@@ -223,10 +244,27 @@ namespace Green
                     gooList.Remove(gooList[i]);
                 }
             }
-
-            oldState = newState;
-            base.Update(gameTime);
         }
+
+        private void EndingStateUpdate(GameTime gameTime)
+        {
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            endingElapsed += elapsed;
+            float delay = 3f;
+
+            if (endingElapsed > delay)
+            {
+                humanManager.Update(gameTime);
+                if (camera.Position.Y > 0)
+                {
+                    camera.Position -= new Vector2(0, 25) * elapsed;
+                }
+            }
+
+            Console.WriteLine(camera.Position);
+
+        }
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -254,6 +292,11 @@ namespace Green
             // Draw boxes
             boxManager.Draw(spriteBatch, pixel);
 
+            if (currentState == GameState.Ending)
+            {
+                humanManager.Draw(spriteBatch);
+            }
+
             // Draw goos
             for (int i = 0; i < gooList.Count; i++)
             {
@@ -266,7 +309,7 @@ namespace Green
                 chargeList[i].Draw(spriteBatch);
             }
 
-            spriteBatch.DrawString(font,score + "/20", new Vector2(325, 0), Color.White);
+            spriteBatch.DrawString(font,score + "/20", new Vector2(325, 0 + 240), Color.White);
 
             spriteBatch.End();
 
@@ -287,5 +330,25 @@ namespace Green
 
             base.Draw(gameTime);
         }
+
+        private void ChangeState(GameState newState)
+        {
+            switch (newState)
+            {
+                case GameState.Game:
+                    {
+                        // Empty for now
+                        break;
+                    }
+                case GameState.Ending:
+                    {
+                        humanManager = new HumanManager(Content);
+                        break;
+                    }
+            }
+
+            currentState = newState;
+        }
+
     }
 }

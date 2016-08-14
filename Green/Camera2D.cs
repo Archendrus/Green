@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Green
@@ -20,7 +14,8 @@ namespace Green
             Rotation = 0;
             Zoom = 1;
             Origin = new Vector2(viewport.Width / 2f, viewport.Height / 2f);
-            Position = Vector2.Zero;
+            //Position = Vector2.Zero;
+            Position = new Vector2(0, 240);
         }
 
         public Vector2 Position { get; set; }

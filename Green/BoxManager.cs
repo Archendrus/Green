@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 
 namespace Green
@@ -99,13 +95,13 @@ namespace Green
                 {
                     isBigBox = false;
                     newTexture = smallBoxTexture;
-                    newPosition = new Vector2(0, 144);
+                    newPosition = new Vector2(0, 144 + 240);
                 }
                 else
                 {
                     isBigBox = true;
                     newTexture = bigBoxTexture;
-                    newPosition = new Vector2(0, 128);
+                    newPosition = new Vector2(0, 128 + 240);
                 }
 
                 Boxes.Add(new Box(newTexture, newPosition, isBigBox, scale));
