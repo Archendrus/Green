@@ -73,12 +73,6 @@
 /processorParam:TextureFormat=Color
 /build:charge.png
 
-#begin emulogic.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:emulogic.spritefont
-
 #begin BigBoxFull.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -150,4 +144,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:smallBoxOver.png
+
+#begin emulogic.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=NoChange
+/build:emulogic.spritefont
+
+#begin textFont.bmp
+/importer:TextureImporter
+/processor:FontTextureProcessor
+/processorParam:FirstCharacter= 
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Color
+/build:textFont.bmp
 

@@ -85,7 +85,7 @@ namespace Green
 
         private void MakeBoxes(GameTime time)
         {
-            float boxRate = 3f;
+            float boxRate = 2f;
             boxTimerElapsed += (float)time.ElapsedGameTime.TotalSeconds;
 
             if (boxTimerElapsed > boxRate)

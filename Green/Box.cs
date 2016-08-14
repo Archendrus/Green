@@ -30,7 +30,7 @@ namespace Green
         public Box(Texture2D texture, Vector2 position,bool isBigBox, Vector2 scale)
             : base(texture,position,scale)
         {
-            speed = 80f;
+            speed = 50f;
             IsBigBox = isBigBox;
             Filled = false;
         }

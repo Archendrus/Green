@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Green
 {
@@ -15,6 +16,8 @@ namespace Green
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteBatch targetBatch;
+        RenderTarget2D target;
         Vector2 Scale;
         Rectangle screenRectangle;
 
@@ -32,6 +35,9 @@ namespace Green
 
         BoxManager boxManager;
 
+        Viewport newViewport;
+        Camera2D camera;
+
         int score;
 
         // DEBUG
@@ -40,10 +46,20 @@ namespace Green
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 400 * 3;
-            graphics.PreferredBackBufferHeight = 240 * 3;
+            graphics.PreferredBackBufferWidth = 400  *2;
+            graphics.PreferredBackBufferHeight = 240 * 2;
+
+            // Fullscreen
+            //graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            //graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
             IsFixedTimeStep = false;
+
+            // Fullscreen
+            //graphics.HardwareModeSwitch = false;
+            //graphics.IsFullScreen = true;
+            //graphics.ApplyChanges();
+
 
             Content.RootDirectory = "Content";
         }
@@ -58,9 +74,16 @@ namespace Green
         {
             // TODO: Add your initialization logic here
             screenRectangle = new Rectangle(
-                0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+                0, 0, 400, 240);
 
-            Scale = new Vector2(3, 3);
+            newViewport = new Viewport(0, 0, 400, 240);
+            GraphicsDevice.Viewport = newViewport;
+
+            camera = new Camera2D(GraphicsDevice.Viewport);
+
+            Console.WriteLine(GraphicsDevice.Viewport);
+
+            Scale = new Vector2(1, 1);
 
             score = 0;
 
@@ -76,6 +99,9 @@ namespace Green
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            targetBatch = new SpriteBatch(GraphicsDevice);
+            target = new RenderTarget2D(GraphicsDevice, 400, 240);
 
             font = Content.Load<SpriteFont>("emulogic");
 
@@ -142,11 +168,30 @@ namespace Green
                     float xPos = 160 + chargeList.Count * 16; 
                     chargeList.Add(new Sprite(chargeTexture, new Vector2(xPos, 0), Scale));
                 }
-            } 
+            }
+
+            if (newState.IsKeyDown(Keys.S) && oldState.IsKeyUp(Keys.S))
+            {
+                //camera.Position -= new Vector2(0, 250) * elapsed;
+                tileMap.ChangeMap();
+                //GraphicsDevice.Viewport = new Viewport(0, 360, 400 * 3, 240 * 3);
+
+                camera.Position = new Vector2(0, 720);
+            }
+
+            if (newState.IsKeyDown(Keys.X))
+            {
+                //camera.Position -= new Vector2(0, 250) * elapsed;
+                //tileMap.ChangeMap();
+                //GraphicsDevice.Viewport = new Viewport(0, 360, 400 * 3, 240 * 3);
+
+                camera.Position -= new Vector2(0, 250) * elapsed;
+            }
+
+            //tileMap.Update(gameTime);
 
             // Move boxes
             boxManager.Update(gameTime, ref score);
-
 
             // Update goos
             for (int i = 0; i < gooList.Count; i++)
@@ -189,8 +234,9 @@ namespace Green
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.SetRenderTarget(target);
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            var viewMatrix = camera.GetViewMatrix();
             // TODO: Add your drawing code here
             // Draw to screen
             spriteBatch.Begin(
@@ -198,7 +244,9 @@ namespace Green
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
                 DepthStencilState.None,
-                RasterizerState.CullCounterClockwise);
+                RasterizerState.CullCounterClockwise,
+                null,
+                viewMatrix);
 
             // Draw map
             tileMap.Draw(spriteBatch);
@@ -218,9 +266,24 @@ namespace Green
                 chargeList[i].Draw(spriteBatch);
             }
 
-            spriteBatch.DrawString(font,score + "/20", new Vector2(350, 0) * Scale, Color.White);
+            spriteBatch.DrawString(font,score + "/20", new Vector2(325, 0), Color.White);
 
             spriteBatch.End();
+
+            GraphicsDevice.SetRenderTarget(null);
+
+            targetBatch.Begin(
+                SpriteSortMode.Deferred,
+                BlendState.AlphaBlend,
+                SamplerState.PointClamp,
+                DepthStencilState.None,
+                RasterizerState.CullCounterClockwise);
+            
+            // Fullscreen draw
+            //targetBatch.Draw(target, new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height), Color.White);
+            targetBatch.Draw(target, new Rectangle(0, 0, 400 * 2, 240 * 2), Color.White);
+
+            targetBatch.End();
 
             base.Draw(gameTime);
         }

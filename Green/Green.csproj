@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BoxManager.cs" />
+    <Compile Include="Camera2D.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Goo.cs" />
     <Compile Include="Program.cs" />
@@ -89,9 +90,7 @@
     <None Include="Content\charge.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Content\emulogic.spritefont">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Content\emulogic.spritefont" />
     <None Include="Content\goo.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -107,6 +106,7 @@
     <None Include="Content\smallBoxOver.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Content\textFont.xnb" />
     <None Include="Content\tiles.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

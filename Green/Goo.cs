@@ -17,7 +17,7 @@ namespace Green
         public Goo(Texture2D texture, Vector2 position, Vector2 scale, int charges)
             : base(texture, position, scale)
         {
-            speed = 250f;
+            speed = 150f;
             this.Charges = charges;
         }
 

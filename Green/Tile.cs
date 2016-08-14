@@ -11,7 +11,7 @@ namespace Green
         public static int Width { get; private set; }
         public static int Height { get; private set; }
         public Rectangle SourceRectangle { get; private set; } // Source rectangle from tile sheet
-        public Vector2 Position { get; private set; }
+        public Vector2 Position { get; set; }
         public bool IsSolid { get; private set; }
         Vector2 scale;
 
