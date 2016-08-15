@@ -39,6 +39,8 @@ namespace Green
         Texture2D fgMachine;
         Sprite fgMachineSp;
 
+        Texture2D wheelSheet;
+
         Viewport newViewport;
         Camera2D camera;
 
@@ -60,19 +62,19 @@ namespace Green
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 400  *2;
-            graphics.PreferredBackBufferHeight = 240 * 2;
+            //graphics.PreferredBackBufferWidth = 400  *2;
+            //graphics.PreferredBackBufferHeight = 240 * 2;
 
             // Fullscreen
-            //graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            //graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
             IsFixedTimeStep = false;
 
             // Fullscreen
-            //graphics.HardwareModeSwitch = false;
-            //graphics.IsFullScreen = true;
-            //graphics.ApplyChanges();
+            graphics.HardwareModeSwitch = false;
+            graphics.IsFullScreen = true;
+            graphics.ApplyChanges();
 
 
             Content.RootDirectory = "Content";
@@ -123,7 +125,9 @@ namespace Green
             Texture2D temp;
 
             temp = Content.Load<Texture2D>("tiles");
-            tileMap = new TileMap(temp, Scale);
+            wheelSheet = Content.Load<Texture2D>("wheel");
+            tileMap = new TileMap(temp, Scale, wheelSheet);
+
 
             boxManager = new BoxManager(this.Content, Scale, screenRectangle);
 
@@ -212,7 +216,7 @@ namespace Green
                 //camera.Position -= new Vector2(0, 250) * elapsed;
             }
 
-            //tileMap.Update(gameTime);
+            tileMap.Update(gameTime);
 
             // Move boxes
             boxManager.Update(gameTime, ref score);
@@ -270,7 +274,7 @@ namespace Green
                 }
             }
 
-            Console.WriteLine(camera.Position);
+            //Console.WriteLine(camera.Position);
 
         }
 
@@ -334,8 +338,8 @@ namespace Green
                 RasterizerState.CullCounterClockwise);
             
             // Fullscreen draw
-            //targetBatch.Draw(target, new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height), Color.White);
-            targetBatch.Draw(target, new Rectangle(0, 0, 400 * 2, 240 * 2), Color.White);
+            targetBatch.Draw(target, new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height), Color.White);
+            //targetBatch.Draw(target, new Rectangle(0, 0, 400 * 2, 240 * 2), Color.White);
 
             targetBatch.End();
 

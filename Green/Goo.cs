@@ -26,7 +26,7 @@ namespace Green
             this.Charges = charges;
         }
 
-        public void Update(GameTime time)
+        public new void Update(GameTime time)
         {
             float elapsed = (float)time.ElapsedGameTime.TotalSeconds;
             Position += new Vector2(0, speed * elapsed);

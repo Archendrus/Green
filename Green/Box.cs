@@ -29,7 +29,7 @@ namespace Green
             Filled = false;
         }
 
-        public void Update(GameTime time)
+        public new void Update(GameTime time)
         {
             float elapsed = (float)time.ElapsedGameTime.TotalSeconds;
             Position += new Vector2(speed * elapsed, 0);

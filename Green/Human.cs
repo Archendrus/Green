@@ -15,7 +15,7 @@ namespace Green
             direction = new Vector2(1, 0);
         }
 
-        public void Update(GameTime time)
+        public new void Update(GameTime time)
         {
             float elapsed = (float)time.ElapsedGameTime.TotalSeconds;
             if (Position.X > 192)

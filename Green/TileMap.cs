@@ -26,10 +26,18 @@ namespace Green
         private bool isSolid;  // set if solid tile (=1)
         Vector2 scale;
 
-        public TileMap(Texture2D tileSheet, Vector2 scale)
+        // Animated
+        private List<Sprite> animatedTiles;
+        public Texture2D wheelSheet;
+
+        public TileMap(Texture2D tileSheet, Vector2 scale, Texture2D wheelSheet)
         {
             this.tileSheet = tileSheet;
             this.scale = scale;
+            this.wheelSheet = wheelSheet;
+
+            animatedTiles = new List<Sprite>();
+
             map = new int[,]
             {
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -40,16 +48,16 @@ namespace Green
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+                {1,1,26,1,1,26,1,1,26,1,1,26,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,10,9,9,9,8,0,0,0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,3,2,2,2,7,0,0,0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,3,2,2,2,7,0,0,0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,4,5,5,5,6,0,0,0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -57,7 +65,7 @@ namespace Green
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                {1,1,26,1,1,26,1,1,26,1,1,26,1,1,26,1,1,26,1,1,26,1,1,26,1},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -121,12 +129,20 @@ namespace Green
                         isSolid = false;
                     }
 
-                    // Create new tile
-                    Tile newTile = new Tile(new Rectangle(tileId * 16, 0, 16, 16),
-                                       position, scale, isSolid);
+                    if (tileId == 26) // LOL
+                    {
+                        animatedTiles.Add(new Sprite(wheelSheet, position, scale, 4, 16, 16, .05f));
+                    }
+                    else
+                    {
+                        // Create new tile
+                        Tile newTile = new Tile(new Rectangle(tileId * 16, 0, 16, 16),
+                                           position, scale, isSolid);
 
-                    // Add new tile to tiles array
-                    tiles[i, j] = newTile;
+                        // Add new tile to tiles array
+                        tiles[i, j] = newTile;
+                    }
+
                 }
             }
         }
@@ -151,6 +167,14 @@ namespace Green
         //}
 
 
+        public void Update(GameTime time)
+        {
+            for (int i = 0; i < animatedTiles.Count; i++)
+            {
+                animatedTiles[i].Update(time);
+            }
+        }
+
         // Draw all tiles in tile array
         public void Draw(SpriteBatch spriteBatch)
         {
@@ -171,6 +195,11 @@ namespace Green
                         SpriteEffects.None,
                         0.0f);
                 }
+            }
+
+            foreach (Sprite tile in animatedTiles)
+            {
+                tile.Draw(spriteBatch);
             }
         }
 
