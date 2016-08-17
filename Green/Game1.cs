@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace Green
 {
@@ -33,23 +34,38 @@ namespace Green
         List<Sprite> chargeList;
         Texture2D chargeTexture;
 
+        Texture2D noChargeTexture;
+        List<Sprite> noChargeList;
+
         BoxManager boxManager;
         HumanManager humanManager;
 
         Texture2D fgMachine;
         Sprite fgMachineSp;
 
+        Texture2D instructionsTexture;
+
         Texture2D wheelSheet;
 
         Viewport newViewport;
         Camera2D camera;
 
+        SoundEffect good;
+        SoundEffect bad;
+        SoundEffect load;
+        SoundEffect shoot;
+
+        Song gameSong;
+        Song endSong;
+
         float endingElapsed;
+        float endingEndingElapsed;
 
         int score;
 
         enum GameState
         {
+            Instructions,
             Game,
             Ending
         }
@@ -72,9 +88,9 @@ namespace Green
             IsFixedTimeStep = false;
 
             // Fullscreen
-            graphics.HardwareModeSwitch = false;
-            graphics.IsFullScreen = true;
-            graphics.ApplyChanges();
+            //graphics.HardwareModeSwitch = false;
+            //graphics.IsFullScreen = true;
+            //graphics.ApplyChanges();
 
 
             Content.RootDirectory = "Content";
@@ -101,7 +117,7 @@ namespace Green
 
             score = 0;
 
-            currentState = GameState.Game;
+            currentState = GameState.Instructions;
 
 
             base.Initialize();
@@ -121,6 +137,8 @@ namespace Green
 
             font = Content.Load<SpriteFont>("emulogic");
 
+            instructionsTexture = Content.Load<Texture2D>("instructions");
+
             // TODO: use this.Content to load your game content here
             Texture2D temp;
 
@@ -137,6 +155,22 @@ namespace Green
             chargeTexture = Content.Load<Texture2D>("charge");
             chargeList = new List<Sprite>();
 
+            noChargeTexture = Content.Load<Texture2D>("noCharge");
+            noChargeList = new List<Sprite>();
+
+            for (int i = 0; i < 5; i++)
+            {
+                float xPos = 160 + i * 16;
+                noChargeList.Add(new Sprite(noChargeTexture, new Vector2(xPos, 0 + 240), Scale));
+            }
+
+            good = Content.Load<SoundEffect>("good");
+            bad = Content.Load<SoundEffect>("bad");
+            load = Content.Load<SoundEffect>("load");
+            shoot = Content.Load<SoundEffect>("shoot");
+
+            gameSong = Content.Load<Song>("gamemusic");
+            endSong = Content.Load<Song>("endingmusic");
 
             // DEBUG
             pixel = new Texture2D(GraphicsDevice,1,1,false,SurfaceFormat.Color);
@@ -170,6 +204,14 @@ namespace Green
 
             switch (currentState)
             {
+                case GameState.Instructions:
+                    {
+                       if (newState.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
+                        {
+                            ChangeState(GameState.Game);
+                        }
+                       break;
+                    }
                 case GameState.Game:
                     {
                         GameStateUpdate(gameTime, newState);
@@ -196,6 +238,7 @@ namespace Green
                 {
                     gooList.Add(new Goo(gooTexture, new Vector2(192, 48 + 240), Scale, chargeList.Count));
                     chargeList.Clear();
+                    shoot.Play();
                 }
             }
 
@@ -206,13 +249,14 @@ namespace Green
                 {
                     float xPos = 160 + chargeList.Count * 16;
                     chargeList.Add(new Sprite(chargeTexture, new Vector2(xPos, 0 + 240), Scale));
+                    load.Play();
                 }
             }
 
 
             if (newState.IsKeyDown(Keys.X))
             {
-                ChangeState(GameState.Ending);
+                //ChangeState(GameState.Ending);
                 //camera.Position -= new Vector2(0, 250) * elapsed;
             }
 
@@ -232,6 +276,14 @@ namespace Green
                     if (gooList[i].HitBox.Intersects(boxManager.Boxes[j].HitBox))
                     {
                         boxManager.FillBox(boxManager.Boxes[j], gooList[i].Charges);
+                        if (boxManager.Boxes[j].Filled)
+                        {
+                            good.Play();
+                        }
+                        else
+                        {
+                            bad.Play();
+                        }
                         gooList[i].Kill();
                     }
                 }
@@ -264,6 +316,7 @@ namespace Green
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             endingElapsed += elapsed;
             float delay = 3f;
+            float endEndDelay = 25f;
 
             if (endingElapsed > delay)
             {
@@ -272,7 +325,15 @@ namespace Green
                 {
                     camera.Position -= new Vector2(0, 25) * elapsed;
                 }
+
+                endingEndingElapsed += elapsed;
+                if (endingEndingElapsed > endEndDelay)
+                {
+                    Exit();
+                }
             }
+
+
 
             //Console.WriteLine(camera.Position);
 
@@ -318,6 +379,11 @@ namespace Green
                 fgMachineSp.Draw(spriteBatch);
             }
 
+            for (int i = 0; i < noChargeList.Count; i++)
+            {
+                noChargeList[i].Draw(spriteBatch);
+            }
+
             // Draw charges
             for (int i = 0; i < chargeList.Count; i++)
             {
@@ -325,6 +391,11 @@ namespace Green
             }
 
             spriteBatch.DrawString(font,score + "/20", new Vector2(300, 0 + 240), Color.White);
+
+            if (currentState == GameState.Instructions)
+            {
+                spriteBatch.Draw(instructionsTexture, new Vector2(0, 240), Color.White);
+            }
 
             spriteBatch.End();
 
@@ -352,11 +423,14 @@ namespace Green
             {
                 case GameState.Game:
                     {
-                        // Empty for now
+                        MediaPlayer.Play(gameSong);
+                        MediaPlayer.IsRepeating = true;
                         break;
                     }
                 case GameState.Ending:
                     {
+                        MediaPlayer.Play(endSong);
+                        MediaPlayer.IsRepeating = true;
                         fgMachine = Content.Load<Texture2D>("fgMachine");
                         fgMachineSp = new Sprite(fgMachine, new Vector2(192,192), Scale);
                         humanManager = new HumanManager(Content);
